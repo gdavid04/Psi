@@ -80,11 +80,17 @@ public abstract class SpellParam<T> {
 	public final String name;
 	public final int color;
 	public final boolean canDisable;
+	public final boolean draw;
 
 	public SpellParam(String name, int color, boolean canDisable) {
+		this(name, color, canDisable, true);
+	}
+
+	public SpellParam(String name, int color, boolean canDisable, boolean draw) {
 		this.name = name;
 		this.color = color;
 		this.canDisable = canDisable;
+		this.draw = draw;
 	}
 
 	/**

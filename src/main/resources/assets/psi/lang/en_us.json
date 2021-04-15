@@ -632,7 +632,7 @@
   "psi.spellerror.unsetparam": "A required Parameter is not set",
   "psi.spellerror.nullparam": "A Parameter is facing an empty cell",
   "psi.spellerror.invalidparam": "A Parameter is facing an invalid piece",
-  "psi.spellerror.samesideparams": "Two or more Parameters are sharing a side",
+  "psi.spellerror.samesideparams": "Three or more Parameters are sharing a side",
   "psi.spellerror.loop": "Can't resolve due to endless loop",
   "psi.spellerror.nonpositivevalue": "A Number Parameter that needs to be positive isn't",
   "psi.spellerror.noninteger": "A Number Parameter that needs to an integer isn't",

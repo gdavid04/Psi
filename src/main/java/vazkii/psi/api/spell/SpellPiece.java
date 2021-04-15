@@ -37,6 +37,7 @@ import vazkii.psi.api.PsiAPI;
 import vazkii.psi.api.internal.PsiRenderHelper;
 import vazkii.psi.api.internal.TooltipHelper;
 
+import java.util.EnumMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -352,13 +353,28 @@ public abstract class SpellPiece {
 	@OnlyIn(Dist.CLIENT)
 	public void drawParams(MatrixStack ms, IRenderTypeBuffer buffers, int light) {
 		IVertexBuilder buffer = buffers.getBuffer(PsiAPI.internalHandler.getProgrammerLayer());
+		EnumMap<SpellParam.Side, Integer> sideCount = new EnumMap<SpellParam.Side, Integer>(SpellParam.Side.class);
 		for (SpellParam<?> param : paramSides.keySet()) {
 			SpellParam.Side side = paramSides.get(param);
-			if (side.isEnabled()) {
+			if (side.isEnabled() && param.draw) {
+				sideCount.compute(side, (SpellParam.Side s, Integer old) -> old == null ? 0 : old + 1);
+			}
+		}
+		EnumMap<SpellParam.Side, Integer> sideIndex = new EnumMap<SpellParam.Side, Integer>(SpellParam.Side.class);
+		for (SpellParam<?> param : paramSides.keySet()) {
+			SpellParam.Side side = paramSides.get(param);
+			if (side.isEnabled() && param.draw) {
 				int minX = 4;
 				int minY = 4;
 				minX += side.offx * 9;
 				minY += side.offy * 9;
+
+				int count = sideCount.get(side);
+				if (count != 0) {
+					int index = sideIndex.compute(side, (SpellParam.Side s, Integer old) -> old == null ? 0 : old + 1);
+					minX += Math.abs(side.offy) * (8 * index / count - 4);
+					minY += Math.abs(side.offx) * (8 * index / count - 4);
+				}
 
 				int maxX = minX + 8;
 				int maxY = minY + 8;

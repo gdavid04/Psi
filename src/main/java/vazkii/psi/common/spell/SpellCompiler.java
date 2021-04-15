@@ -22,7 +22,7 @@ import vazkii.psi.api.spell.SpellGrid;
 import vazkii.psi.api.spell.SpellParam;
 import vazkii.psi.api.spell.SpellPiece;
 
-import java.util.EnumSet;
+import java.util.EnumMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -107,7 +107,7 @@ public final class SpellCompiler implements ISpellCompiler {
 			processedHandlers.add(piece);
 		}
 
-		EnumSet<SpellParam.Side> usedSides = EnumSet.noneOf(SpellParam.Side.class);
+		EnumMap<SpellParam.Side, Integer> usedSides = new EnumMap<SpellParam.Side, Integer>(SpellParam.Side.class);
 
 		for (SpellParam<?> param : piece.paramSides.keySet()) {
 			if (checkSideDisabled(param, piece, usedSides)) {
@@ -137,7 +137,7 @@ public final class SpellCompiler implements ISpellCompiler {
 		if (redirectionPieces.add(piece)) {
 			piece.addToMetadata(compiled.metadata);
 
-			EnumSet<SpellParam.Side> usedSides = EnumSet.noneOf(SpellParam.Side.class);
+			EnumMap<SpellParam.Side, Integer> usedSides = new EnumMap<SpellParam.Side, Integer>(SpellParam.Side.class);
 
 			for (SpellParam<?> param : piece.paramSides.keySet()) {
 				checkSideDisabled(param, piece, usedSides);
@@ -146,10 +146,10 @@ public final class SpellCompiler implements ISpellCompiler {
 	}
 
 	/** @return whether this piece should get skipped over */
-	private boolean checkSideDisabled(SpellParam<?> param, SpellPiece parent, EnumSet<SpellParam.Side> seen) throws SpellCompilationException {
+	private boolean checkSideDisabled(SpellParam<?> param, SpellPiece parent, EnumMap<SpellParam.Side, Integer> seen) throws SpellCompilationException {
 		SpellParam.Side side = parent.paramSides.get(param);
 		if (side.isEnabled()) {
-			if (!seen.add(side)) {
+			if (seen.compute(side, (SpellParam.Side s, Integer old) -> old == null ? 1 : old + 1) > 2) {
 				throw new SpellCompilationException(SpellCompilationException.SAME_SIDE_PARAMS, parent.x, parent.y);
 			}
 			return false;

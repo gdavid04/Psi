@@ -52,9 +52,9 @@ public class PieceCrossConnector extends SpellPiece implements IGenericRedirecto
 	@Override
 	public void initParams() {
 		addParam(in1 = new ParamAny(SpellParam.CONNECTOR_NAME_FROM1, LINE_ONE, false));
-		addParam(out1 = new ParamAny(SpellParam.CONNECTOR_NAME_TO1, LINE_ONE, false));
+		addParam(out1 = new ParamAny(SpellParam.CONNECTOR_NAME_TO1, LINE_ONE, false, false));
 		addParam(in2 = new ParamAny(SpellParam.CONNECTOR_NAME_FROM2, LINE_TWO, false));
-		addParam(out2 = new ParamAny(SpellParam.CONNECTOR_NAME_TO2, LINE_TWO, false));
+		addParam(out2 = new ParamAny(SpellParam.CONNECTOR_NAME_TO2, LINE_TWO, false, false));
 	}
 
 	@Override
@@ -70,6 +70,10 @@ public class PieceCrossConnector extends SpellPiece implements IGenericRedirecto
 	@Override
 	public void addToMetadata(SpellMetadata meta) throws SpellCompilationException {
 		meta.addStat(EnumSpellStat.COMPLEXITY, 1);
+		// two params can't share the same side to make it easier to read and prevent some edge cases
+		if (paramSides.values().stream().distinct().count() != paramSides.values().size()) {
+			throw new SpellCompilationException(SpellCompilationException.INVALID_PARAM);
+		}
 	}
 
 	@Override
@@ -123,43 +127,6 @@ public class PieceCrossConnector extends SpellPiece implements IGenericRedirecto
 			buffer.tex(maxU, minV).lightmap(light).endVertex();
 			buffer.pos(mat, 0, 0, 0).color(r, g, b, 1F);
 			buffer.tex(minU, minV).lightmap(light).endVertex();
-		}
-	}
-
-	@Override
-	@OnlyIn(Dist.CLIENT)
-	public void drawParams(MatrixStack ms, IRenderTypeBuffer buffers, int light) {
-		drawParam(ms, buffers, light, in1);
-		drawParam(ms, buffers, light, in2);
-	}
-
-	public void drawParam(MatrixStack ms, IRenderTypeBuffer buffers, int light, SpellParam<?> param) {
-		IVertexBuilder buffer = buffers.getBuffer(PsiAPI.internalHandler.getProgrammerLayer());
-		SpellParam.Side side = paramSides.get(param);
-		if (side.isEnabled()) {
-			int minX = 4;
-			int minY = 4;
-			minX += side.offx * 9;
-			minY += side.offy * 9;
-
-			int maxX = minX + 8;
-			int maxY = minY + 8;
-
-			float wh = 8F;
-			float minU = side.u / 256F;
-			float minV = side.v / 256F;
-			float maxU = (side.u + wh) / 256F;
-			float maxV = (side.v + wh) / 256F;
-			int r = PsiRenderHelper.r(param.color);
-			int g = PsiRenderHelper.g(param.color);
-			int b = PsiRenderHelper.b(param.color);
-			int a = 255;
-			Matrix4f mat = ms.getLast().getMatrix();
-
-			buffer.pos(mat, minX, maxY, 0).color(r, g, b, a).tex(minU, maxV).lightmap(light).endVertex();
-			buffer.pos(mat, maxX, maxY, 0).color(r, g, b, a).tex(maxU, maxV).lightmap(light).endVertex();
-			buffer.pos(mat, maxX, minY, 0).color(r, g, b, a).tex(maxU, minV).lightmap(light).endVertex();
-			buffer.pos(mat, minX, minY, 0).color(r, g, b, a).tex(minU, minV).lightmap(light).endVertex();
 		}
 	}
 
