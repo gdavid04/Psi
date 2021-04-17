@@ -357,7 +357,7 @@ public abstract class SpellPiece {
 			if (side.isEnabled()) {
 				int minX = 4;
 				int minY = 4;
-				minX += side.offx * 9;
+				minX += side.offx * 9 + side.offy * 4;
 				minY += side.offy * 9;
 
 				int maxX = minX + 8;

@@ -530,12 +530,12 @@ public class GuiProgrammer extends Screen {
 						SpellParam<?> param = piece.params.get(paramName);
 						int x = left - 17;
 						int y = top + 70 + i * 26;
-						for (SpellParam.Side side : ImmutableSet.of(SpellParam.Side.TOP, SpellParam.Side.BOTTOM, SpellParam.Side.LEFT, SpellParam.Side.RIGHT, SpellParam.Side.OFF)) {
+						for (SpellParam.Side side : SpellParam.Side.values()) {
 							if (!side.isEnabled() && !param.canDisable) {
 								continue;
 							}
 
-							int xp = x + side.offx * 8;
+							int xp = x + side.offx * 8 + side.offy * 4;
 							int yp = y + side.offy * 8;
 							configWidget.configButtons.add(new GuiButtonSideConfig(this, selectedX, selectedY, i, paramName, side, xp, yp, button -> {
 								if (!spectator) {

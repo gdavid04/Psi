@@ -136,7 +136,9 @@ public abstract class SpellParam<T> {
 		TOP(0, -1, 222, 8),
 		BOTTOM(0, 1, 230, 8),
 		LEFT(-1, 0, 230, 0),
-		RIGHT(1, 0, 222, 0);
+		RIGHT(1, 0, 222, 0),
+		TOP_RIGHT(1, -1, 222, 8),
+		BOTTOM_LEFT(-1, 1, 230, 8);
 
 		public static final Side[] DIRECTIONS = new Side[] { TOP, BOTTOM, LEFT, RIGHT };
 

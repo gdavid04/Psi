@@ -51,7 +51,7 @@ public final class SpellGrid {
 				SpellPiece p = gridData[i][j];
 				if (p != null) {
 					ms.push();
-					ms.translate(i * 18, j * 18, 0);
+					ms.translate(i * 18 + j * 9, j * 18, 0);
 					p.draw(ms, buffers, light);
 					ms.pop();
 				}
