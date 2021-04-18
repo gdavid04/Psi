@@ -172,6 +172,15 @@ public class CADData implements ICapabilityProvider, ICADData, ISpellAcceptor, I
 	public void setSelectedSlot(int slot) {
 		cad.getOrCreateTag().putInt(IPsimetalTool.TAG_SELECTED_SLOT, slot);
 	}
+	
+	@Override
+	public boolean showSlotInRadialMenu(int slot) {
+		int sockets = ((ICAD) cad.getItem()).getStatValue(cad, EnumCADStat.SOCKETS);
+		if (sockets == -1 || sockets > ItemCADSocket.MAX_SOCKETS) {
+			sockets = ItemCADSocket.MAX_SOCKETS;
+		}
+		return slot < sockets + 1;
+	}
 
 	@Override
 	public CompoundNBT serializeForSynchronization() {

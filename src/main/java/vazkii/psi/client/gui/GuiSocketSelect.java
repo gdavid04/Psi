@@ -106,7 +106,7 @@ public class GuiSocketSelect extends Screen {
 		socketableStack = stack;
 		socketable = ISocketable.socketable(stack);
 
-		for (int i = 0; i < ISocketable.MAX_SLOTS; i++) {
+		for (int i = 0; i < ISocketable.MAX_SLOTS + 1; i++) {
 			if (socketable.showSlotInRadialMenu(i)) {
 				slots.add(i);
 			}
