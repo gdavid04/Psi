@@ -86,15 +86,13 @@ public class PieceTrickCollapseBlockSequence extends PieceTrick {
 			if (!context.isInRadius(Vector3.fromBlockPos(blockPos))) {
 				throw new SpellRuntimeException(SpellRuntimeException.OUTSIDE_RADIUS);
 			}
-			BlockPos posDown = blockPos.down();
 			BlockState state = world.getBlockState(blockPos);
-			BlockState stateDown = world.getBlockState(posDown);
 
 			if (!world.isBlockModifiable(context.caster, blockPos)) {
 				break;
 			}
 
-			if (stateDown.isAir(world, posDown) && state.getBlockHardness(world, blockPos) != -1 &&
+			if (state.getBlockHardness(world, blockPos) != -1 &&
 					PieceTrickBreakBlock.canHarvestBlock(state, context.caster, world, blockPos, tool) &&
 					world.getTileEntity(blockPos) == null) {
 

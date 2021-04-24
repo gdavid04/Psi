@@ -62,15 +62,13 @@ public class PieceTrickCollapseBlock extends PieceTrick {
 
 		World world = context.caster.getEntityWorld();
 		BlockPos pos = positionVal.toBlockPos();
-		BlockPos posDown = pos.down();
 		BlockState state = world.getBlockState(pos);
-		BlockState stateDown = world.getBlockState(posDown);
 
 		if (!world.isBlockModifiable(context.caster, pos)) {
 			throw new SpellRuntimeException(SpellRuntimeException.IMMUNE_TARGET);
 		}
 
-		if (stateDown.isAir(world, posDown) && state.getBlockHardness(world, pos) != -1 &&
+		if (state.getBlockHardness(world, pos) != -1 &&
 				PieceTrickBreakBlock.canHarvestBlock(state, context.caster, world, pos, tool) &&
 				world.getTileEntity(pos) == null) {
 
