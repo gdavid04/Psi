@@ -9,6 +9,7 @@
 package vazkii.psi.common.spell.trick.block;
 
 import net.minecraft.block.BlockState;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.item.FallingBlockEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.BlockPos;
@@ -43,6 +44,11 @@ public class PieceTrickCollapseBlock extends PieceTrick {
 	}
 
 	@Override
+	public Class<?> getEvaluationType() {
+		return Entity.class;
+	}
+
+	@Override
 	public Object execute(SpellContext context) throws SpellRuntimeException {
 		ItemStack tool = context.getHarvestTool();
 		Vector3 positionVal = this.getParamValue(context, position);
@@ -61,7 +67,7 @@ public class PieceTrickCollapseBlock extends PieceTrick {
 		BlockState stateDown = world.getBlockState(posDown);
 
 		if (!world.isBlockModifiable(context.caster, pos)) {
-			return null;
+			throw new SpellRuntimeException(SpellRuntimeException.IMMUNE_TARGET);
 		}
 
 		if (stateDown.isAir(world, posDown) && state.getBlockHardness(world, pos) != -1 &&
@@ -71,13 +77,14 @@ public class PieceTrickCollapseBlock extends PieceTrick {
 			BlockEvent.BreakEvent event = PieceTrickBreakBlock.createBreakEvent(state, context.caster, world, pos, tool);
 			MinecraftForge.EVENT_BUS.post(event);
 			if (event.isCanceled()) {
-				return null;
+				throw new SpellRuntimeException(SpellRuntimeException.IMMUNE_TARGET);
 			}
 
 			FallingBlockEntity falling = new FallingBlockEntity(world, pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5, state);
 			world.addEntity(falling);
+			return falling;
 		}
-		return null;
+		throw new SpellRuntimeException(SpellRuntimeException.NULL_TARGET);
 	}
 
 }

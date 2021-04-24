@@ -9,6 +9,7 @@
 package vazkii.psi.common.spell.trick.block;
 
 import net.minecraft.block.BlockState;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.item.FallingBlockEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.BlockPos;
@@ -23,6 +24,10 @@ import vazkii.psi.api.spell.*;
 import vazkii.psi.api.spell.param.ParamNumber;
 import vazkii.psi.api.spell.param.ParamVector;
 import vazkii.psi.api.spell.piece.PieceTrick;
+import vazkii.psi.api.spell.wrapper.EntityListWrapper;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class PieceTrickCollapseBlockSequence extends PieceTrick {
 
@@ -39,6 +44,11 @@ public class PieceTrickCollapseBlockSequence extends PieceTrick {
 		addParam(position = new ParamVector(SpellParam.GENERIC_NAME_POSITION, SpellParam.BLUE, false, false));
 		addParam(target = new ParamVector(SpellParam.GENERIC_NAME_TARGET, SpellParam.GREEN, false, false));
 		addParam(maxBlocks = new ParamNumber(SpellParam.GENERIC_NAME_MAX, SpellParam.RED, false, true));
+	}
+
+	@Override
+	public Class<?> getEvaluationType() {
+		return EntityListWrapper.class;
 	}
 
 	@Override
@@ -71,6 +81,7 @@ public class PieceTrickCollapseBlockSequence extends PieceTrick {
 
 		World world = context.caster.world;
 		Vector3 targetNorm = targetVal.copy().normalize();
+		List<Entity> list = new ArrayList<>();
 		for (BlockPos blockPos : MathHelper.getBlocksAlongRay(positionVal.toVec3D(), positionVal.copy().add(targetNorm.copy().multiply(maxBlocksInt)).toVec3D(), maxBlocksInt)) {
 			if (!context.isInRadius(Vector3.fromBlockPos(blockPos))) {
 				throw new SpellRuntimeException(SpellRuntimeException.OUTSIDE_RADIUS);
@@ -80,7 +91,7 @@ public class PieceTrickCollapseBlockSequence extends PieceTrick {
 			BlockState stateDown = world.getBlockState(posDown);
 
 			if (!world.isBlockModifiable(context.caster, blockPos)) {
-				return null;
+				break;
 			}
 
 			if (stateDown.isAir(world, posDown) && state.getBlockHardness(world, blockPos) != -1 &&
@@ -90,14 +101,15 @@ public class PieceTrickCollapseBlockSequence extends PieceTrick {
 				BlockEvent.BreakEvent event = PieceTrickBreakBlock.createBreakEvent(state, context.caster, world, blockPos, tool);
 				MinecraftForge.EVENT_BUS.post(event);
 				if (event.isCanceled()) {
-					return null;
+					break;
 				}
 
 				FallingBlockEntity falling = new FallingBlockEntity(world, blockPos.getX() + 0.5, blockPos.getY() + 0.5, blockPos.getZ() + 0.5, state);
 				world.addEntity(falling);
+				list.add(falling);
 			}
 		}
 
-		return null;
+		return EntityListWrapper.make(list);
 	}
 }
