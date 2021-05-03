@@ -15,6 +15,7 @@ import vazkii.psi.api.spell.Spell;
 import vazkii.psi.api.spell.SpellContext;
 import vazkii.psi.api.spell.SpellMetadata;
 import vazkii.psi.api.spell.SpellParam;
+import vazkii.psi.api.spell.SpellParam.ArrowType;
 import vazkii.psi.api.spell.SpellPiece;
 import vazkii.psi.api.spell.param.ParamAny;
 
@@ -33,7 +34,7 @@ public abstract class PieceErrorHandler extends SpellPiece implements IErrorCatc
 
 	@Override
 	public void initParams() {
-		addParam(piece = new ParamAny(paramName(), SpellParam.BROWN, false));
+		addParam(piece = new ParamAny(paramName(), SpellParam.BROWN, false, ArrowType.OUT));
 	}
 
 	@Override
