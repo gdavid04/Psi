@@ -69,7 +69,7 @@ public class SpellCostsWidget extends Widget {
 
 				RenderSystem.color3f(1f, 1f, 1f);
 				parent.getMinecraft().getTextureManager().bindTexture(GuiProgrammer.texture);
-				blit(ms, statX, statY, (stat.ordinal() + 1) * 12, parent.ySize + 16, 12, 12);
+				blit(ms, statX, statY, (stat.ordinal() + 1) * 12, parent.ySize + 16, 12, 12, 512, 512);
 				parent.getMinecraft().fontRenderer.drawString(ms, s, statX + 16, statY + 2, cadStat != null && cadVal < val && cadVal != -1 ? 0xFF6666 : 0xFFFFFF);
 
 				if (mouseX > statX && mouseY > statY && mouseX < statX + 12 && mouseY < statY + 12 && !parent.panelWidget.panelEnabled) {

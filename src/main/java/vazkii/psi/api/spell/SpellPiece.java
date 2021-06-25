@@ -414,10 +414,10 @@ public abstract class SpellPiece {
 			side = side.getOpposite();
 		}
 		float wh = 8F;
-		float minU = side.u / 256F;
-		float minV = side.v / 256F;
-		float maxU = (side.u + wh) / 256F;
-		float maxV = (side.v + wh) / 256F;
+		float minU = side.u / 512F;
+		float minV = side.v / 512F;
+		float maxU = (side.u + wh) / 512F;
+		float maxV = (side.v + wh) / 512F;
 		int r = PsiRenderHelper.r(param.color);
 		int g = PsiRenderHelper.g(param.color);
 		int b = PsiRenderHelper.b(param.color);

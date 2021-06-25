@@ -16,6 +16,7 @@ import vazkii.psi.api.cad.CADStatEvent;
 import vazkii.psi.api.cad.EnumCADComponent;
 import vazkii.psi.api.cad.EnumCADStat;
 import vazkii.psi.api.cad.ICAD;
+import vazkii.psi.api.spell.SpellGrid;
 import vazkii.psi.common.item.base.ModItems;
 import vazkii.psi.common.lib.LibMisc;
 
@@ -123,7 +124,7 @@ public class DefaultStats {
 		if (!assembly.isEmpty() && assembly.getItem() == ModItems.cadAssemblyCreative) {
 			switch (event.getStat()) {
 			case BANDWIDTH:
-				event.setStatValue(9);
+				event.setStatValue(SpellGrid.GRID_SIZE);
 				break;
 			case SOCKETS:
 				event.setStatValue(12);

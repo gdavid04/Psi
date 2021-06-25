@@ -145,8 +145,8 @@ public class GuiProgrammer extends Screen {
 
 	@Override
 	protected void init() {
-		xSize = 174;
-		ySize = 184;
+		xSize = 6 + 6 + SpellGrid.GRID_SIZE * 18;
+		ySize = 6 + 16 + SpellGrid.GRID_SIZE * 18;
 		padLeft = 7;
 		padTop = 7;
 		left = (width - xSize) / 2;
@@ -168,12 +168,12 @@ public class GuiProgrammer extends Screen {
 		helpButton = addButton(new GuiButtonHelp(left + xSize + 2, top + ySize - (spectator ? 32 : 48), this));
 		configWidget = addButton(new SideConfigWidget(left - 81, top + 55, 81, 115, this));
 
-		spellNameField = addButton(new CallbackTextFieldWidget(getMinecraft().fontRenderer, left + xSize - 130, top + ySize - 14, 120, 10, button -> {
+		spellNameField = addButton(new CallbackTextFieldWidget(getMinecraft().fontRenderer, left + 44, top + ySize - 14, 192, 10, button -> {
 			spell.name = spellNameField.getText();
 			onSpellChanged(true);
 		}));
 		spellNameField.setEnableBackgroundDrawing(false);
-		spellNameField.setMaxStringLength(20);
+		spellNameField.setMaxStringLength(32);
 		spellNameField.setEnabled(!spectator);
 
 		commentField = addButton(new CallbackTextFieldWidget(getMinecraft().fontRenderer, left, top + ySize / 2 - 10, xSize, 20, button -> {
@@ -308,7 +308,7 @@ public class GuiProgrammer extends Screen {
 		RenderSystem.color3f(1F, 1F, 1F);
 		getMinecraft().getTextureManager().bindTexture(texture);
 
-		blit(ms, left, top, 0, 0, xSize, ySize);
+		blit(ms, left, top, 0, 0, xSize, ySize, 512, 512);
 
 		//Currently selected piece
 		SpellPiece piece = null;
@@ -318,7 +318,7 @@ public class GuiProgrammer extends Screen {
 
 		cursorX = (mouseX - gridLeft) / 18;
 		cursorY = (mouseY - gridTop) / 18;
-		if (panelWidget.panelEnabled || cursorX > 8 || cursorY > 8 || cursorX < 0 || cursorY < 0 || mouseX < gridLeft || mouseY < gridTop) {
+		if (panelWidget.panelEnabled || cursorX >= SpellGrid.GRID_SIZE || cursorY >= SpellGrid.GRID_SIZE || cursorX < 0 || cursorY < 0 || mouseX < gridLeft || mouseY < gridTop) {
 			cursorX = -1;
 			cursorY = -1;
 		}
@@ -342,7 +342,7 @@ public class GuiProgrammer extends Screen {
 		getMinecraft().getTextureManager().bindTexture(texture);
 
 		if (selectedX != -1 && selectedY != -1 && !takingScreenshot) {
-			blit(ms, gridLeft + selectedX * 18, gridTop + selectedY * 18, 32, ySize, 16, 16);
+			blit(ms, gridLeft + selectedX * 18, gridTop + selectedY * 18, 32, ySize, 16, 16, 512, 512);
 		}
 
 		if (hasAltDown()) {
@@ -380,9 +380,9 @@ public class GuiProgrammer extends Screen {
 
 			if (!takingScreenshot) {
 				if (cursorX == selectedX && cursorY == selectedY) {
-					blit(ms, gridLeft + cursorX * 18, gridTop + cursorY * 18, 16, ySize, 8, 16);
+					blit(ms, gridLeft + cursorX * 18, gridTop + cursorY * 18, 16, ySize, 8, 16, 512, 512);
 				} else {
-					blit(ms, gridLeft + cursorX * 18, gridTop + cursorY * 18, 16, ySize, 16, 16);
+					blit(ms, gridLeft + cursorX * 18, gridTop + cursorY * 18, 16, ySize, 16, 16, 512, 512);
 				}
 			}
 		}

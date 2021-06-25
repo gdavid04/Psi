@@ -44,7 +44,7 @@ public class GuiButtonIO extends Button {
 
 			Minecraft.getInstance().textureManager.bindTexture(GuiProgrammer.texture);
 			RenderSystem.color4f(1F, 1F, 1F, 1F);
-			blit(ms, x, y, hover ? 186 : 174, out ? 169 : 181, width, height);
+			blit(ms, x, y, hover ? 186 + 72 : 174 + 72, out ? 169 + 72 : 181 + 72, width, height, 512, 512);
 
 			if (hover) {
 				String key = out ? "psimisc.export_to_clipboard" : "psimisc.import_from_clipboard";

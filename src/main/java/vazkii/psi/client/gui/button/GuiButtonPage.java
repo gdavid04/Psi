@@ -42,7 +42,7 @@ public class GuiButtonPage extends Button {
 
 			Minecraft.getInstance().textureManager.bindTexture(GuiProgrammer.texture);
 			RenderSystem.color4f(1F, 1F, 1F, 1F);
-			blit(ms, x, y, hover ? 216 : 198, right ? 145 : 155, width, height);
+			blit(ms, x, y, hover ? 216 + 72 : 198 + 72, right ? 145 + 72 : 155 + 72, width, height, 512, 512);
 
 			if (hover) {
 				gui.tooltip.add(new TranslationTextComponent(right ? "psimisc.next_page" : "psimisc.prev_page"));

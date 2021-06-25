@@ -43,8 +43,8 @@ public class StatusWidget extends Widget {
 	public void renderButton(MatrixStack ms, int mouseX, int mouseY, float pTicks) {
 		RenderSystem.color3f(1f, 1f, 1f);
 		parent.getMinecraft().getTextureManager().bindTexture(GuiProgrammer.texture);
-		blit(ms, parent.left - 48, parent.top + 5, parent.xSize, 0, 48, 30);
-		blit(ms, parent.left - 16, parent.top + 13, parent.compileResult.right().isPresent() ? 12 : 0, parent.ySize + 28, 12, 12);
+		blit(ms, parent.left - 48, parent.top + 5, parent.xSize, 0, 48, 30, 512, 512);
+		blit(ms, parent.left - 16, parent.top + 13, parent.compileResult.right().isPresent() ? 12 : 0, parent.ySize + 28, 12, 12, 512, 512);
 
 		if (mouseX > parent.left - 16 - 1 && mouseY > parent.top + 13 - 1 && mouseX < parent.left - 16 + 13 && mouseY < parent.top + 13 + 13) {
 			if (parent.compileResult.right().isPresent()) {

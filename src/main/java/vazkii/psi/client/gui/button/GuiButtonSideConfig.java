@@ -81,10 +81,10 @@ public class GuiButtonSideConfig extends Button {
 			}
 
 			float wh = 8F;
-			float minU = side.u / 256F;
-			float minV = side.v / 256F;
-			float maxU = (side.u + wh) / 256F;
-			float maxV = (side.v + wh) / 256F;
+			float minU = side.u / 512F;
+			float minV = side.v / 512F;
+			float maxU = (side.u + wh) / 512F;
+			float maxV = (side.v + wh) / 512F;
 			RenderSystem.enableAlphaTest();
 			BufferBuilder wr = Tessellator.getInstance().getBuffer();
 			wr.begin(7, DefaultVertexFormats.POSITION_TEX);
