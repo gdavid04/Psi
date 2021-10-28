@@ -1,6 +1,7 @@
 # Experimental feature branches
 
 ### [better-error-catcher](https://github.com/gdavid04/Psi/tree/better-error-catcher)
+[![Download](https://img.shields.io/badge/download-better--error--catcher-9cf)](Psi 1.16 better-error-catcher.jar)  
 Changes Error Catcher to output the error handled value instead of replacing the result of its target.  
 Preview of what Error Catcher could become after 1.18 port.
 
