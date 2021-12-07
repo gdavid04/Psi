@@ -28,5 +28,6 @@ Increases the spell grid size to 13x13
 The programmer GUI is buggy.
 
 ### [hexa-grid](https://github.com/gdavid04/Psi/tree/hexa-grid)
+[![Download](https://img.shields.io/badge/download-hexa--grid-fc9)](Psi 1.16 hexa-grid.jar)  
 Changes the spell grid to consist of hexagons instead of squares.  
 The programmer GUI, connector lines and bandwidth calculation are very buggy.
