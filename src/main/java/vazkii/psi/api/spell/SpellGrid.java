@@ -11,6 +11,7 @@ package vazkii.psi.api.spell;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.math.Vector3f;
 
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.nbt.CompoundTag;
@@ -35,7 +36,7 @@ public final class SpellGrid {
 	private static final String TAG_SPELL_POS_Y = "y";
 	private static final String TAG_SPELL_DATA = "data";
 
-	public static final int GRID_SIZE = 9;
+	public static final int GRID_SIZE = 16;
 	public static final int GRID_CENTER = (GRID_SIZE - 1) / 2;
 
 	public final Spell spell;
@@ -46,12 +47,14 @@ public final class SpellGrid {
 
 	@OnlyIn(Dist.CLIENT)
 	public void draw(PoseStack ms, MultiBufferSource buffers, int light) {
+		float radius = 18 / 2 / (float) Math.tan(Math.PI / GRID_SIZE);
 		for (int i = 0; i < GRID_SIZE; i++) {
 			for (int j = 0; j < GRID_SIZE; j++) {
 				SpellPiece p = gridData[i][j];
 				if (p != null) {
 					ms.pushPose();
-					ms.translate(i * 18, j * 18, 0);
+					ms.mulPose(Vector3f.YP.rotationDegrees(i * 360.0f / GRID_SIZE));
+					ms.translate(-9, j * 18, radius);
 					p.draw(ms, buffers, light);
 					ms.popPose();
 				}
@@ -235,8 +238,8 @@ public final class SpellGrid {
 	}
 
 	public SpellPiece getPieceAtSideSafely(int x, int y, SpellParam.Side side) {
-		int xp = x + side.offx;
-		int yp = y + side.offy;
+		int xp = (x + side.offx + SpellGrid.GRID_SIZE) % SpellGrid.GRID_SIZE;
+		int yp = (y + side.offy + SpellGrid.GRID_SIZE) % SpellGrid.GRID_SIZE;
 		if (!exists(xp, yp)) {
 			return null;
 		}

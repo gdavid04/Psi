@@ -17,6 +17,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.Tesselator;
 import com.mojang.blaze3d.vertex.VertexFormat;
 import com.mojang.datafixers.util.Either;
+import com.mojang.math.Vector3f;
 
 import net.minecraft.ChatFormatting;
 import net.minecraft.Util;
@@ -160,7 +161,7 @@ public class GuiProgrammer extends Screen {
 		padTop = 7;
 		left = (width - xSize) / 2;
 		top = (height - ySize) / 2;
-		gridLeft = left + padLeft;
+		gridLeft = left + padLeft + 18 * SpellGrid.GRID_SIZE / 2;
 		gridTop = top + padTop;
 		cursorX = cursorY = -1;
 		tooltipFlag = getMinecraft().options.advancedItemTooltips ? TooltipFlag.Default.ADVANCED : TooltipFlag.Default.NORMAL;
@@ -336,6 +337,7 @@ public class GuiProgrammer extends Screen {
 		tooltip.clear();
 		ms.translate(gridLeft, gridTop, 0);
 		MultiBufferSource.BufferSource buffers = MultiBufferSource.immediate(Tesselator.getInstance().getBuilder());
+		ms.mulPose(Vector3f.YN.rotationDegrees(selectedX * 360.0f / SpellGrid.GRID_SIZE));
 		spell.draw(ms, buffers, 0xF000F0);
 		buffers.endBatch();
 
@@ -714,8 +716,8 @@ public class GuiProgrammer extends Screen {
 						return true;
 					}
 				} else {
-					if (!onSideButtonKeybind(piece, param, SpellParam.Side.LEFT) && selectedX > 0) {
-						selectedX--;
+					if (!onSideButtonKeybind(piece, param, SpellParam.Side.LEFT)) {
+						selectedX = (selectedX + SpellGrid.GRID_SIZE - 1) % SpellGrid.GRID_SIZE;
 						onSelectedChanged();
 						if (hasShiftDown() && spell.grid.gridData[selectedX][selectedY] == null) {
 							PieceConnector connector = new PieceConnector(spell);
@@ -743,8 +745,8 @@ public class GuiProgrammer extends Screen {
 						return true;
 					}
 				} else {
-					if (!onSideButtonKeybind(piece, param, SpellParam.Side.RIGHT) && selectedX < SpellGrid.GRID_SIZE - 1) {
-						selectedX++;
+					if (!onSideButtonKeybind(piece, param, SpellParam.Side.RIGHT)) {
+						selectedX = (selectedX + 1) % SpellGrid.GRID_SIZE;
 						onSelectedChanged();
 						if (hasShiftDown() && spell.grid.gridData[selectedX][selectedY] == null) {
 							PieceConnector connector = new PieceConnector(spell);
