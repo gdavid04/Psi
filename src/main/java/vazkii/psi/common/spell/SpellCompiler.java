@@ -9,32 +9,14 @@
 package vazkii.psi.common.spell;
 
 import com.mojang.datafixers.util.Either;
-
-import vazkii.psi.api.spell.CompiledSpell;
-import vazkii.psi.api.spell.CompiledSpell.Action;
-import vazkii.psi.api.spell.EnumPieceType;
-import vazkii.psi.api.spell.EnumSpellStat;
-import vazkii.psi.api.spell.ISpellCompiler;
-import vazkii.psi.api.spell.Spell;
-import vazkii.psi.api.spell.SpellCompilationException;
-import vazkii.psi.api.spell.SpellGrid;
-import vazkii.psi.api.spell.SpellParam;
-import vazkii.psi.api.spell.SpellPiece;
+import vazkii.psi.api.spell.*;
 
 import java.util.EnumSet;
 import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
-import java.util.function.Predicate;
 
-/* Probably not thread-safe. */
 public final class SpellCompiler implements ISpellCompiler {
-
-	/** The current spell being compiled. */
-	private CompiledSpell compiled;
-
-	private final Set<SpellPiece> redirectionPieces = new HashSet<>();
 
 	@Override
 	public Either<CompiledSpell, SpellCompilationException> compile(Spell in) {
@@ -50,15 +32,16 @@ public final class SpellCompiler implements ISpellCompiler {
 			throw new SpellCompilationException(SpellCompilationException.NO_SPELL);
 		}
 
-		redirectionPieces.clear();
-		compiled = new CompiledSpell(spell);
+		CompiledSpell compiled = new CompiledSpell(spell);
+		
+		HashSet<SpellPiece> built = new HashSet<>();
 
-		List<SpellPiece> tricks = findPieces(EnumPieceType::isTrick);
+		List<SpellPiece> tricks = compiled.sourceSpell.grid.findPieces(EnumPieceType::isTrick);
 		if (tricks.isEmpty()) {
 			throw new SpellCompilationException(SpellCompilationException.NO_TRICKS);
 		}
 		for (SpellPiece trick : tricks) {
-			buildPiece(trick);
+			buildPiece(trick, compiled, built);
 		}
 
 		if (compiled.metadata.getStat(EnumSpellStat.COST) < 0 || compiled.metadata.getStat(EnumSpellStat.POTENCY) < 0) {
@@ -71,57 +54,51 @@ public final class SpellCompiler implements ISpellCompiler {
 		return compiled;
 	}
 
-	public void buildPiece(SpellPiece piece) throws SpellCompilationException {
-		buildPiece(piece, new HashSet<>());
+	public void buildPiece(SpellPiece piece, CompiledSpell compiled, Set<SpellPiece> built) throws SpellCompilationException {
+		buildPiece(piece, compiled, built, new HashSet<>());
 	}
 
-	public void buildPiece(SpellPiece piece, Set<SpellPiece> visited) throws SpellCompilationException {
+	public void buildPiece(SpellPiece piece, CompiledSpell compiled, Set<SpellPiece> built, Set<SpellPiece> visited) throws SpellCompilationException {
 		if (!visited.add(piece)) {
 			throw new SpellCompilationException(SpellCompilationException.INFINITE_LOOP, piece.x, piece.y);
 		}
-
-		if (compiled.actionMap.containsKey(piece)) { // move to top
-			Action a = compiled.actionMap.get(piece);
-			compiled.actions.remove(a);
-			compiled.actions.add(a);
-		} else {
-			Action a = compiled.new Action(piece);
-			compiled.actions.add(a);
-			compiled.actionMap.put(piece, a);
+		
+		if (built.add(piece)) {
+			EnumSet<SpellParam.Side> usedSides = EnumSet.noneOf(SpellParam.Side.class);
+			for (SpellParam<?> param : piece.paramSides.keySet()) {
+				if (checkSideDisabled(param, piece, usedSides)) {
+					continue;
+				}
+				
+				SpellParam.Side side = piece.paramSides.get(param);
+				
+				SpellPiece pieceAt = compiled.sourceSpell.grid.getPieceAtSideWithRedirections(piece.x, piece.y, side,
+					redirect -> buildRedirect(redirect, compiled, built));
+				
+				if (pieceAt == null) {
+					throw new SpellCompilationException(SpellCompilationException.NULL_PARAM, piece.x, piece.y);
+				}
+				if (!param.canAccept(pieceAt)) {
+					throw new SpellCompilationException(SpellCompilationException.INVALID_PARAM, piece.x, piece.y);
+				}
+				
+				buildPiece(pieceAt, compiled, built, visited);
+			}
+			compiled.actions.add(0, compiled.new Action(piece));
 			piece.addToMetadata(compiled.metadata);
 		}
-
-		EnumSet<SpellParam.Side> usedSides = EnumSet.noneOf(SpellParam.Side.class);
-		for (SpellParam<?> param : piece.paramSides.keySet()) {
-			if (checkSideDisabled(param, piece, usedSides)) {
-				continue;
-			}
-
-			SpellParam.Side side = piece.paramSides.get(param);
-
-			SpellPiece pieceAt = compiled.sourceSpell.grid.getPieceAtSideWithRedirections(piece.x, piece.y, side, this::buildRedirect);
-
-			if (pieceAt == null) {
-				throw new SpellCompilationException(SpellCompilationException.NULL_PARAM, piece.x, piece.y);
-			}
-			if (!param.canAccept(pieceAt)) {
-				throw new SpellCompilationException(SpellCompilationException.INVALID_PARAM, piece.x, piece.y);
-			}
-
-			HashSet<SpellPiece> visitedCopy = new HashSet<>(visited);
-			buildPiece(pieceAt, visitedCopy);
-		}
+		visited.remove(piece);
 	}
 
-	public void buildRedirect(SpellPiece piece) throws SpellCompilationException {
-		if (redirectionPieces.add(piece)) {
-			piece.addToMetadata(compiled.metadata);
-
+	public void buildRedirect(SpellPiece piece, CompiledSpell compiled, Set<SpellPiece> built) throws SpellCompilationException {
+		if (built.add(piece)) {
 			EnumSet<SpellParam.Side> usedSides = EnumSet.noneOf(SpellParam.Side.class);
-
+			
 			for (SpellParam<?> param : piece.paramSides.keySet()) {
 				checkSideDisabled(param, piece, usedSides);
 			}
+			
+			piece.addToMetadata(compiled.metadata);
 		}
 	}
 
@@ -139,21 +116,6 @@ public final class SpellCompiler implements ISpellCompiler {
 			}
 			return true;
 		}
-	}
-
-	public List<SpellPiece> findPieces(Predicate<EnumPieceType> match) throws SpellCompilationException {
-		List<SpellPiece> results = new LinkedList<>();
-		for (int i = 0; i < SpellGrid.GRID_SIZE; i++) {
-			for (int j = 0; j < SpellGrid.GRID_SIZE; j++) {
-				SpellPiece piece = compiled.sourceSpell.grid.gridData[j][i];
-				if (piece != null && match.test(piece.getPieceType())) {
-					results.add(0, piece);
-				}
-
-			}
-		}
-
-		return results;
 	}
 
 }

@@ -18,8 +18,6 @@ import vazkii.psi.api.internal.IPlayerData;
 import vazkii.psi.common.network.MessageRegister;
 import vazkii.psi.common.network.message.MessageSpellError;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Stack;
 
 /**
@@ -31,16 +29,12 @@ public class CompiledSpell {
 	public final SpellMetadata metadata = new SpellMetadata();
 
 	public final Stack<Action> actions = new Stack<>();
-	public final Map<SpellPiece, Action> actionMap = new HashMap<>();
 
 	public Action currentAction;
-	public final boolean[][] spotsEvaluated;
 
 	public CompiledSpell(Spell source) {
 		sourceSpell = source;
 		metadata.setStat(EnumSpellStat.BANDWIDTH, source.grid.getSize());
-
-		spotsEvaluated = new boolean[SpellGrid.GRID_SIZE][SpellGrid.GRID_SIZE];
 	}
 
 	/**
@@ -98,14 +92,6 @@ public class CompiledSpell {
 				MessageRegister.sendToPlayer(message, context.caster);
 			}
 		}
-	}
-
-	public boolean hasEvaluated(int x, int y) {
-		if (!SpellGrid.exists(x, y)) {
-			return false;
-		}
-
-		return spotsEvaluated[x][y];
 	}
 
 	public class Action {

@@ -18,7 +18,9 @@ import net.minecraft.nbt.ListTag;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
+import java.util.LinkedList;
 import java.util.List;
+import java.util.function.Predicate;
 
 /**
  * Holder class for a spell's piece grid. Pretty much all internal, nothing to see here.
@@ -242,6 +244,19 @@ public final class SpellGrid {
 		}
 
 		return gridData[xp][yp];
+	}
+	
+	public List<SpellPiece> findPieces(Predicate<EnumPieceType> match) {
+		List<SpellPiece> results = new LinkedList<>();
+		for (int i = 0; i < SpellGrid.GRID_SIZE; i++) {
+			for (int j = 0; j < SpellGrid.GRID_SIZE; j++) {
+				SpellPiece piece = gridData[j][i];
+				if (piece != null && match.test(piece.getPieceType())) {
+					results.add(piece);
+				}
+			}
+		}
+		return results;
 	}
 
 	public SpellGrid(Spell spell) {
