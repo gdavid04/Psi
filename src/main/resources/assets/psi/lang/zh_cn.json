@@ -442,8 +442,6 @@
   "psi.spellpiece.cross_connector.desc": "可以连接两条路径",
   "psi.spellpiece.error_suppressor": "错误消除符",
   "psi.spellpiece.error_suppressor.desc": "消除魔法式产生的错误",
-  "psi.spellpiece.error_catch": "错误捕获符",
-  "psi.spellpiece.error_catch.desc": "用指定值替换错误",
   "psi.spellpiece.trick_debug": "启动式:调试",
   "psi.spellpiece.trick_debug.desc": "测试用，输出目标调试信息",
   "psi.spellpiece.trick_delay": "启动式:休眠",
