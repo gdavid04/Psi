@@ -73,7 +73,7 @@ public class EntityTrickMote extends Entity implements ISpellImmune {
     public static EntityTrickMote create(SpellContext context, Runnable effect, Supplier<Vec3> tracker) {
         ItemStack cad = PsiAPI.getPlayerCAD(context.caster);
         ItemStack colorizer = cad.isEmpty() ? ItemStack.EMPTY : ((ICAD) cad.getItem()).getComponentInSlot(cad, EnumCADComponent.DYE);
-        Vec3 pos = context.focalPoint.position().add(0, context.focalPoint instanceof Player ? context.focalPoint.getEyeHeight() : 0, 0);
+        Vec3 pos = context.focalPoint.position().add(0, context.focalPoint instanceof Player ? context.focalPoint.getEyeHeight() - 0.5 : 0, 0);
         Vec3 targetPos = tracker.get();
         Vec3 delta = targetPos.subtract(pos);
         float speed = 1;
