@@ -8,11 +8,9 @@ import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.network.NetworkHooks;
 import net.minecraftforge.registries.ObjectHolder;
@@ -21,20 +19,13 @@ import vazkii.psi.api.cad.EnumCADComponent;
 import vazkii.psi.api.cad.ICAD;
 import vazkii.psi.api.internal.PsiRenderHelper;
 import vazkii.psi.api.internal.Vector3;
-import vazkii.psi.api.spell.ISpellAcceptor;
 import vazkii.psi.api.spell.ISpellImmune;
-import vazkii.psi.api.spell.Spell;
 import vazkii.psi.api.spell.SpellContext;
 import vazkii.psi.common.Psi;
-import vazkii.psi.common.block.tile.TileConjured;
 import vazkii.psi.common.lib.LibEntityNames;
 import vazkii.psi.common.lib.LibResources;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-import java.util.Optional;
-import java.util.UUID;
-import java.util.function.Function;
 import java.util.function.Supplier;
 
 public class EntityTrickMote extends Entity implements ISpellImmune {
@@ -80,14 +71,24 @@ public class EntityTrickMote extends Entity implements ISpellImmune {
     }
 
     public static EntityTrickMote create(SpellContext context, Runnable effect, Supplier<Vec3> tracker) {
-        EntityTrickMote mote = new EntityTrickMote(TYPE, context.focalPoint.level);
         ItemStack cad = PsiAPI.getPlayerCAD(context.caster);
         ItemStack colorizer = cad.isEmpty() ? ItemStack.EMPTY : ((ICAD) cad.getItem()).getComponentInSlot(cad, EnumCADComponent.DYE);
+        Vec3 pos = context.focalPoint.position().add(0, context.focalPoint instanceof Player ? context.focalPoint.getEyeHeight() : 0, 0);
+        Vec3 targetPos = tracker.get();
+        Vec3 delta = targetPos.subtract(pos);
+        float speed = 1;
+        if (delta.lengthSqr() <= 0.1 * 0.1) {
+            vfx(pos, delta, colorizer);
+            effect.run();
+            return null;
+        }
+        EntityTrickMote mote = new EntityTrickMote(TYPE, context.focalPoint.level);
         mote.entityData.set(COLORIZER_DATA, colorizer);
-        mote.entityData.set(TRACK_SPEED, 1F);
+        mote.setDst(targetPos);
+        mote.entityData.set(TRACK_SPEED, speed);
         mote.effect = effect;
         mote.tracker = tracker;
-        mote.setPos(context.focalPoint.getX(), context.focalPoint.getY() + (context.focalPoint instanceof Player ? context.focalPoint.getEyeHeight() : 0), context.focalPoint.getZ());
+        mote.setPos(pos);
         context.focalPoint.level.addFreshEntity(mote);
         return mote;
     }
@@ -141,21 +142,7 @@ public class EntityTrickMote extends Entity implements ISpellImmune {
 
         if(level.isClientSide) {
             ItemStack colorizer = entityData.get(COLORIZER_DATA);
-            int colorVal = Psi.proxy.getColorForColorizer(colorizer);
-
-            float r = PsiRenderHelper.r(colorVal) / 255F;
-            float g = PsiRenderHelper.g(colorVal) / 255F;
-            float b = PsiRenderHelper.b(colorVal) / 255F;
-            for(int i = 0; i < PARTICLE_COUNT; i++) {
-                double t = Math.random();
-                double x = getX() + getDeltaMovement().x * t;
-                double y = getY() + getDeltaMovement().y * t;
-                double z = getZ() + getDeltaMovement().z * t;
-                float dx = (float) (Math.random() - 0.5f) * 0.025f;
-                float dy = (float) (Math.random() - 0.5f) * 0.025f;
-                float dz = (float) (Math.random() - 0.5f) * 0.025f;
-                Psi.proxy.sparkleFX(x, y, z, r, g, b, dx, dy, dz, 1.2f, 15);
-            }
+            vfx(position(), getDeltaMovement(), colorizer);
         } else {
             if (tracker == null || effect == null) {
                 discard();
@@ -170,13 +157,33 @@ public class EntityTrickMote extends Entity implements ISpellImmune {
 
         homeTowardsDst();
     }
+    
+    private static void vfx(Vec3 pos, Vec3 motion, ItemStack colorizer) {
+        int colorVal = Psi.proxy.getColorForColorizer(colorizer);
+        float r = PsiRenderHelper.r(colorVal) / 255F;
+        float g = PsiRenderHelper.g(colorVal) / 255F;
+        float b = PsiRenderHelper.b(colorVal) / 255F;
+        
+        for(int i = 0; i < PARTICLE_COUNT; i++) {
+            double t = Math.random();
+            Vec3 p = pos.add(motion.scale(t));
+            float dx = (float) (Math.random() - 0.5f) * 0.025f;
+            float dy = (float) (Math.random() - 0.5f) * 0.025f;
+            float dz = (float) (Math.random() - 0.5f) * 0.025f;
+            Psi.proxy.sparkleFX(p.x, p.y, p.z, r, g, b, dx, dy, dz, 1.2f, 15);
+        }
+    }
 
     private Vec3 updateDst() {
         Vec3 dst = tracker.get();
+        setDst(dst);
+        return dst;
+    }
+    
+    private void setDst(Vec3 dst) {
         entityData.set(DST_X, (float) dst.x);
         entityData.set(DST_Y, (float) dst.y);
         entityData.set(DST_Z, (float) dst.z);
-        return dst;
     }
 
     private void homeTowardsDst() {
