@@ -47,14 +47,11 @@ import vazkii.psi.client.model.ModelCAD;
 import vazkii.psi.client.model.ModelPsimetalExosuit;
 import vazkii.psi.client.render.entity.RenderSpellCircle;
 import vazkii.psi.client.render.entity.RenderSpellProjectile;
+import vazkii.psi.client.render.entity.RenderTrickMote;
 import vazkii.psi.client.render.tile.RenderTileProgrammer;
 import vazkii.psi.common.block.tile.TileProgrammer;
 import vazkii.psi.common.core.proxy.IProxy;
-import vazkii.psi.common.entity.EntitySpellCharge;
-import vazkii.psi.common.entity.EntitySpellCircle;
-import vazkii.psi.common.entity.EntitySpellGrenade;
-import vazkii.psi.common.entity.EntitySpellMine;
-import vazkii.psi.common.entity.EntitySpellProjectile;
+import vazkii.psi.common.entity.*;
 import vazkii.psi.common.item.base.ModItems;
 import vazkii.psi.common.lib.LibItemNames;
 import vazkii.psi.common.lib.LibMisc;
@@ -82,6 +79,7 @@ public class ClientProxy implements IProxy {
 		evt.registerEntityRenderer(EntitySpellGrenade.TYPE, RenderSpellProjectile::new);
 		evt.registerEntityRenderer(EntitySpellProjectile.TYPE, RenderSpellProjectile::new);
 		evt.registerEntityRenderer(EntitySpellMine.TYPE, RenderSpellProjectile::new);
+		evt.registerEntityRenderer(EntityTrickMote.TYPE, RenderTrickMote::new);
 	}
 
 	@SubscribeEvent

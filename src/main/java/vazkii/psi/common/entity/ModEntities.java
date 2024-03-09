@@ -62,6 +62,14 @@ public final class ModEntities {
 							.setShouldReceiveVelocityUpdates(true)
 							.sized(0, 0)
 							.build(""));
+			helper.register(new ResourceLocation(LibMisc.MOD_ID, LibEntityNames.TRICK_MOTE),
+					EntityType.Builder.of(EntityTrickMote::new, MISC)
+							.setTrackingRange(256)
+							.setUpdateInterval(10)
+							.setShouldReceiveVelocityUpdates(true)
+							.sized(0, 0)
+							.fireImmune()
+							.build(""));
 		});
 	}
 }

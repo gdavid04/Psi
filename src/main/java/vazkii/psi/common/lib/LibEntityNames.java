@@ -15,5 +15,5 @@ public final class LibEntityNames {
 	public static final String SPELL_GRENADE = "spell_grenade";
 	public static final String SPELL_CHARGE = "spell_charge";
 	public static final String SPELL_MINE = "spell_mine";
-
+    public static final String TRICK_MOTE = "trick_mote";
 }

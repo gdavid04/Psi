@@ -27,6 +27,7 @@ import vazkii.psi.api.spell.SpellRuntimeException;
 import vazkii.psi.api.spell.StatLabel;
 import vazkii.psi.api.spell.param.ParamVector;
 import vazkii.psi.api.spell.piece.PieceTrick;
+import vazkii.psi.common.entity.EntityTrickMote;
 
 public class PieceTrickSmite extends PieceTrick {
 
@@ -61,18 +62,17 @@ public class PieceTrickSmite extends PieceTrick {
 			throw new SpellRuntimeException(SpellRuntimeException.OUTSIDE_RADIUS);
 		}
 
-		BlockEvent.EntityPlaceEvent placeEvent = new BlockEvent.EntityPlaceEvent(BlockSnapshot.create(context.focalPoint.getCommandSenderWorld().dimension(), context.focalPoint.getCommandSenderWorld(), positionVal.toBlockPos()), context.focalPoint.getCommandSenderWorld().getBlockState(positionVal.toBlockPos().relative(Direction.UP)), context.caster);
-		MinecraftForge.EVENT_BUS.post(placeEvent);
-		if(placeEvent.isCanceled()) {
-			return null;
-		}
+		EntityTrickMote.create(context, positionVal, () -> {
+			BlockEvent.EntityPlaceEvent placeEvent = new BlockEvent.EntityPlaceEvent(BlockSnapshot.create(context.focalPoint.getCommandSenderWorld().dimension(), context.focalPoint.getCommandSenderWorld(), positionVal.toBlockPos()), context.focalPoint.getCommandSenderWorld().getBlockState(positionVal.toBlockPos().relative(Direction.UP)), context.caster);
+			MinecraftForge.EVENT_BUS.post(placeEvent);
+			if(placeEvent.isCanceled()) return;
 
-		if(context.focalPoint.getCommandSenderWorld() instanceof ServerLevel) {
-			LightningBolt lightning = new LightningBolt(EntityType.LIGHTNING_BOLT, context.focalPoint.level);
-			lightning.setPosRaw(positionVal.x, positionVal.y, positionVal.z);
-			context.focalPoint.getCommandSenderWorld().addFreshEntity(lightning);
-		}
-
+			if(context.focalPoint.getCommandSenderWorld() instanceof ServerLevel) {
+				LightningBolt lightning = new LightningBolt(EntityType.LIGHTNING_BOLT, context.focalPoint.level);
+				lightning.setPosRaw(positionVal.x, positionVal.y, positionVal.z);
+				context.focalPoint.getCommandSenderWorld().addFreshEntity(lightning);
+			}
+		});
 		return null;
 	}
 

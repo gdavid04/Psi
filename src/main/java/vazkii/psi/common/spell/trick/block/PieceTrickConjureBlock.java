@@ -33,6 +33,7 @@ import vazkii.psi.api.spell.piece.PieceTrick;
 import vazkii.psi.common.block.BlockConjured;
 import vazkii.psi.common.block.base.ModBlocks;
 import vazkii.psi.common.block.tile.TileConjured;
+import vazkii.psi.common.entity.EntityTrickMote;
 
 import javax.annotation.Nullable;
 
@@ -80,12 +81,11 @@ public class PieceTrickConjureBlock extends PieceTrick {
 
 		Level world = context.focalPoint.getCommandSenderWorld();
 
-		if(!world.mayInteract(context.caster, pos)) {
-			return null;
-		}
+		EntityTrickMote.create(context, pos, () -> {
+			if(!world.mayInteract(context.caster, pos)) return;
 
-		conjure(context, timeVal, pos, world, messWithState(ModBlocks.conjured.defaultBlockState()));
-
+			conjure(context, timeVal, pos, world, messWithState(ModBlocks.conjured.defaultBlockState()));
+		});
 		return null;
 	}
 

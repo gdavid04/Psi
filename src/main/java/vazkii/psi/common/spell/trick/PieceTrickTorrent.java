@@ -35,6 +35,7 @@ import vazkii.psi.api.spell.SpellRuntimeException;
 import vazkii.psi.api.spell.StatLabel;
 import vazkii.psi.api.spell.param.ParamVector;
 import vazkii.psi.api.spell.piece.PieceTrick;
+import vazkii.psi.common.entity.EntityTrickMote;
 
 import javax.annotation.Nullable;
 
@@ -66,12 +67,12 @@ public class PieceTrickTorrent extends PieceTrick {
 			return null;
 		}
 		BlockPos pos = SpellHelpers.getBlockPos(this, context, position, true, false);
-		BlockEvent.EntityPlaceEvent placeEvent = new BlockEvent.EntityPlaceEvent(BlockSnapshot.create(context.focalPoint.getCommandSenderWorld().dimension(), context.focalPoint.getCommandSenderWorld(), pos), context.focalPoint.getCommandSenderWorld().getBlockState(pos.relative(Direction.UP)), context.caster);
-		MinecraftForge.EVENT_BUS.post(placeEvent);
-		if(placeEvent.isCanceled()) {
-			return null;
-		}
-		return placeWater(context.caster, context.focalPoint.level, pos);
+		EntityTrickMote.create(context, pos, () -> {
+			BlockEvent.EntityPlaceEvent placeEvent = new BlockEvent.EntityPlaceEvent(BlockSnapshot.create(context.focalPoint.getCommandSenderWorld().dimension(), context.focalPoint.getCommandSenderWorld(), pos), context.focalPoint.getCommandSenderWorld().getBlockState(pos.relative(Direction.UP)), context.caster);
+			MinecraftForge.EVENT_BUS.post(placeEvent);
+			if(!placeEvent.isCanceled()) placeWater(context.caster, context.focalPoint.level, pos);
+		});
+		return null;
 	}
 
 	// [VanillaCopy] BucketItem.tryPlaceContainingLiquid because buckets are dumb

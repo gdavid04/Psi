@@ -37,6 +37,7 @@ import vazkii.psi.api.spell.StatLabel;
 import vazkii.psi.api.spell.param.ParamVector;
 import vazkii.psi.api.spell.piece.PieceTrick;
 import vazkii.psi.common.core.handler.ConfigHandler;
+import vazkii.psi.common.entity.EntityTrickMote;
 
 import java.util.List;
 import java.util.function.Predicate;
@@ -81,8 +82,9 @@ public class PieceTrickBreakBlock extends PieceTrick {
 		}
 
 		BlockPos pos = positionVal.toBlockPos();
-		removeBlockWithDrops(context, context.caster, context.focalPoint.getCommandSenderWorld(), tool, pos, (v) -> tool.isCorrectToolForDrops(v) || canHarvest(ConfigHandler.COMMON.cadHarvestLevel.get(), v));
-
+		EntityTrickMote.create(context, pos, () -> {
+			removeBlockWithDrops(context, context.caster, context.focalPoint.getCommandSenderWorld(), tool, pos, (v) -> tool.isCorrectToolForDrops(v) || canHarvest(ConfigHandler.COMMON.cadHarvestLevel.get(), v));
+		});
 		return null;
 	}
 
