@@ -24,6 +24,7 @@ import vazkii.psi.api.spell.param.ParamNumber;
 import vazkii.psi.api.spell.param.ParamVector;
 import vazkii.psi.api.spell.piece.PieceTrick;
 import vazkii.psi.common.core.handler.AdditiveMotionHandler;
+import vazkii.psi.common.entity.EntityTrickMote;
 
 public class PieceTrickAddMotion extends PieceTrick {
 
@@ -75,29 +76,30 @@ public class PieceTrickAddMotion extends PieceTrick {
 		return null;
 	}
 
-	public static void addMotion(SpellContext context, Entity e, Vector3 dir, double speed) throws SpellRuntimeException {
+	public static void addMotion(SpellContext context, Entity e, Vector3 d, double speed) throws SpellRuntimeException {
 		context.verifyEntity(e);
 		if(!context.isInRadius(e)) {
 			throw new SpellRuntimeException(SpellRuntimeException.OUTSIDE_RADIUS);
 		}
 
-		dir = dir.copy().normalize().multiply(MULTIPLIER * speed);
-
-		if(Math.abs(dir.y) > 0.0001) {
-			if(e.getDeltaMovement().y() + dir.y >= 0) {
-				e.fallDistance = 0;
-			} else if(dir.y > 0) {
-				double magicnumber = 25d / 98d; // Equal to 1/terminal velocity of living entity
-				double yvel = (e.getDeltaMovement().y() + dir.y) * magicnumber + 1; // inverse % of terminal velocity
-				if(yvel > 0) {
-					float newfall = (float) (-(49 / magicnumber) + (((49 * yvel) - (Math.log(yvel) / Math.log(4 * magicnumber))) / magicnumber));
-					e.fallDistance = Math.min(e.fallDistance, Math.max(0, newfall));
+		EntityTrickMote.create(context, e, () -> {
+			Vector3 dir = d.copy().normalize().multiply(MULTIPLIER * speed);
+	
+			if(Math.abs(dir.y) > 0.0001) {
+				if(e.getDeltaMovement().y() + dir.y >= 0) {
+					e.fallDistance = 0;
+				} else if(dir.y > 0) {
+					double magicnumber = 25d / 98d; // Equal to 1/terminal velocity of living entity
+					double yvel = (e.getDeltaMovement().y() + dir.y) * magicnumber + 1; // inverse % of terminal velocity
+					if(yvel > 0) {
+						float newfall = (float) (-(49 / magicnumber) + (((49 * yvel) - (Math.log(yvel) / Math.log(4 * magicnumber))) / magicnumber));
+						e.fallDistance = Math.min(e.fallDistance, Math.max(0, newfall));
+					}
 				}
 			}
-		}
-
-		AdditiveMotionHandler.addMotion(e, dir.x, dir.y, dir.z);
-
+	
+			AdditiveMotionHandler.addMotion(e, dir.x, dir.y, dir.z);
+		});
 	}
 
 }

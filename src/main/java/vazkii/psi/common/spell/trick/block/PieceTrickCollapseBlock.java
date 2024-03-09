@@ -20,6 +20,7 @@ import vazkii.psi.api.internal.Vector3;
 import vazkii.psi.api.spell.*;
 import vazkii.psi.api.spell.param.ParamVector;
 import vazkii.psi.api.spell.piece.PieceTrick;
+import vazkii.psi.common.entity.EntityTrickMote;
 
 public class PieceTrickCollapseBlock extends PieceTrick {
 
@@ -59,25 +60,22 @@ public class PieceTrickCollapseBlock extends PieceTrick {
 		Level world = context.focalPoint.getCommandSenderWorld();
 		BlockPos pos = positionVal.toBlockPos();
 		BlockPos posDown = pos.below();
-		BlockState state = world.getBlockState(pos);
-		BlockState stateDown = world.getBlockState(posDown);
-
-		if(!world.mayInteract(context.caster, pos)) {
-			return null;
-		}
-
-		if(stateDown.isAir() && state.getDestroySpeed(world, pos) != -1 &&
-				PieceTrickBreakBlock.canHarvestBlock(state, context.caster, world, pos, tool) &&
-				world.getBlockEntity(pos) == null) {
-
-			BlockEvent.BreakEvent event = PieceTrickBreakBlock.createBreakEvent(state, context.caster, world, pos, tool);
-			MinecraftForge.EVENT_BUS.post(event);
-			if(event.isCanceled()) {
-				return null;
+		if (!world.mayInteract(context.caster, pos)) return null;
+		EntityTrickMote.create(context, pos, () -> {
+			BlockState state = world.getBlockState(pos);
+			BlockState stateDown = world.getBlockState(posDown);
+			
+			if (!world.mayInteract(context.caster, pos)) return;
+			
+			if (stateDown.isAir() && state.getDestroySpeed(world, pos) != -1 && PieceTrickBreakBlock.canHarvestBlock(state, context.caster, world, pos, tool) && world.getBlockEntity(pos) == null) {
+				
+				BlockEvent.BreakEvent event = PieceTrickBreakBlock.createBreakEvent(state, context.caster, world, pos, tool);
+				MinecraftForge.EVENT_BUS.post(event);
+				if (event.isCanceled()) return;
+				
+				FallingBlockEntity.fall(world, pos, state);
 			}
-
-			FallingBlockEntity.fall(world, pos, state);
-		}
+		});
 		return null;
 	}
 

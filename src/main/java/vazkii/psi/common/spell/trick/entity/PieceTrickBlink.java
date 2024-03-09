@@ -23,6 +23,7 @@ import vazkii.psi.api.spell.StatLabel;
 import vazkii.psi.api.spell.param.ParamEntity;
 import vazkii.psi.api.spell.param.ParamNumber;
 import vazkii.psi.api.spell.piece.PieceTrick;
+import vazkii.psi.common.entity.EntityTrickMote;
 import vazkii.psi.common.network.MessageRegister;
 import vazkii.psi.common.network.message.MessageBlink;
 
@@ -70,17 +71,19 @@ public class PieceTrickBlink extends PieceTrick {
 		if(!context.isInRadius(e)) {
 			throw new SpellRuntimeException(SpellRuntimeException.OUTSIDE_RADIUS);
 		}
-
-		Vec3 look = e.getLookAngle();
-
-		double offX = look.x * dist;
-		double offY = e.equals(context.caster) ? look.y * dist : Math.max(0, look.y * dist);
-		double offZ = look.z * dist;
-
-		e.setPos(e.getX() + offX, e.getY() + offY, e.getZ() + offZ);
-		if(e instanceof ServerPlayer) {
-			MessageRegister.sendToPlayer(new MessageBlink(offX, offY, offZ), (ServerPlayer) e);
-		}
+		
+		EntityTrickMote.create(context, e, () -> {
+			Vec3 look = e.getLookAngle();
+	
+			double offX = look.x * dist;
+			double offY = e.equals(context.caster) ? look.y * dist : Math.max(0, look.y * dist);
+			double offZ = look.z * dist;
+	
+			e.setPos(e.getX() + offX, e.getY() + offY, e.getZ() + offZ);
+			if(e instanceof ServerPlayer) {
+				MessageRegister.sendToPlayer(new MessageBlink(offX, offY, offZ), (ServerPlayer) e);
+			}
+		});
 	}
 
 }

@@ -22,6 +22,7 @@ import vazkii.psi.api.spell.SpellRuntimeException;
 import vazkii.psi.api.spell.StatLabel;
 import vazkii.psi.api.spell.param.ParamEntity;
 import vazkii.psi.api.spell.piece.PieceTrick;
+import vazkii.psi.common.entity.EntityTrickMote;
 import vazkii.psi.common.spell.selector.entity.PieceSelectorNearbySmeltables;
 
 public class PieceTrickSmeltItem extends PieceTrick {
@@ -52,20 +53,23 @@ public class PieceTrickSmeltItem extends PieceTrick {
 		Entity targetVal = this.getParamValue(context, target);
 
 		if(targetVal instanceof ItemEntity && targetVal.isAlive()) {
-			ItemEntity eitem = (ItemEntity) targetVal;
-			ItemStack stack = eitem.getItem();
-			ItemStack result = PieceSelectorNearbySmeltables.simulateSmelt(eitem.getCommandSenderWorld(), stack);
-
-			if(!result.isEmpty()) {
-				stack.shrink(1);
-				eitem.setItem(stack);
-				if(stack.getCount() == 0) {
-					eitem.remove(Entity.RemovalReason.DISCARDED);
+			EntityTrickMote.create(context, targetVal, () -> {
+				if (!targetVal.isAlive()) return;
+				ItemEntity eitem = (ItemEntity) targetVal;
+				ItemStack stack = eitem.getItem();
+				ItemStack result = PieceSelectorNearbySmeltables.simulateSmelt(eitem.getCommandSenderWorld(), stack);
+	
+				if(!result.isEmpty()) {
+					stack.shrink(1);
+					eitem.setItem(stack);
+					if(stack.getCount() == 0) {
+						eitem.remove(Entity.RemovalReason.DISCARDED);
+					}
+	
+					ItemEntity item = new ItemEntity(context.focalPoint.getCommandSenderWorld(), eitem.getX(), eitem.getY(), eitem.getZ(), result.copy());
+					context.focalPoint.getCommandSenderWorld().addFreshEntity(item);
 				}
-
-				ItemEntity item = new ItemEntity(context.focalPoint.getCommandSenderWorld(), eitem.getX(), eitem.getY(), eitem.getZ(), result.copy());
-				context.focalPoint.getCommandSenderWorld().addFreshEntity(item);
-			}
+			});
 		} else {
 			throw new SpellRuntimeException(SpellRuntimeException.NULL_TARGET);
 		}

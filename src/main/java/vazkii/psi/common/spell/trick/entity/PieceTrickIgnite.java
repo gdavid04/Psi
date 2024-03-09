@@ -21,6 +21,7 @@ import vazkii.psi.api.spell.StatLabel;
 import vazkii.psi.api.spell.param.ParamEntity;
 import vazkii.psi.api.spell.param.ParamNumber;
 import vazkii.psi.api.spell.piece.PieceTrick;
+import vazkii.psi.common.entity.EntityTrickMote;
 
 public class PieceTrickIgnite extends PieceTrick {
 
@@ -58,7 +59,9 @@ public class PieceTrickIgnite extends PieceTrick {
 		int timeVal = this.getParamValue(context, time).intValue();
 
 		context.verifyEntity(targetVal);
-		targetVal.setSecondsOnFire(timeVal);
+		EntityTrickMote.create(context, targetVal, () -> {
+			targetVal.setSecondsOnFire(timeVal);
+		});
 
 		return null;
 	}

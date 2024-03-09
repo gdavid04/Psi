@@ -83,6 +83,8 @@ public class PieceTrickMoveBlockSequence extends PieceTrick {
 		LinkedHashSet<BlockPos> moveableBlocks = new LinkedHashSet<>();
 		LinkedHashSet<BlockPos> immovableBlocks = new LinkedHashSet<>();
 
+		// TODO: I'm not touching this but it should use trick motes too
+		
 		/*
 		 * TODO: Find a better solution than this bandaid for block duping (see #740)
 		 * A possible solution is moving this logic to {@link PieceTrickBreakBlock}

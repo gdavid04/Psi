@@ -24,6 +24,7 @@ import vazkii.psi.api.spell.StatLabel;
 import vazkii.psi.api.spell.param.ParamNumber;
 import vazkii.psi.api.spell.param.ParamVector;
 import vazkii.psi.api.spell.piece.PieceTrick;
+import vazkii.psi.common.entity.EntityTrickMote;
 
 public class PieceTrickTillSequence extends PieceTrick {
 
@@ -65,7 +66,9 @@ public class PieceTrickTillSequence extends PieceTrick {
 		for(BlockPos blockPos : MathHelper.getBlocksAlongRay(positionVal.toVec3D(), positionVal.copy().add(targetNorm.copy().multiply(maxBlocksInt)).toVec3D(), maxBlocksInt)) {
 
 			if(SpellHelpers.isBlockPosInRadius(context, blockPos)) {
-				PieceTrickTill.tillBlock(context.caster, context.focalPoint.level, blockPos);
+				EntityTrickMote.create(context, blockPos, () -> {
+					PieceTrickTill.tillBlock(context.caster, context.focalPoint.level, blockPos);
+				});
 			}
 
 		}

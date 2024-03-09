@@ -27,6 +27,7 @@ import vazkii.psi.api.spell.SpellRuntimeException;
 import vazkii.psi.api.spell.StatLabel;
 import vazkii.psi.api.spell.param.ParamVector;
 import vazkii.psi.api.spell.piece.PieceTrick;
+import vazkii.psi.common.entity.EntityTrickMote;
 
 public class PieceTrickBlaze extends PieceTrick {
 
@@ -61,25 +62,24 @@ public class PieceTrickBlaze extends PieceTrick {
 			throw new SpellRuntimeException(SpellRuntimeException.OUTSIDE_RADIUS);
 		}
 
-		BlockPos pos = positionVal.toBlockPos();
-
-		pos = pos.below();
-		BlockState state = context.focalPoint.getCommandSenderWorld().getBlockState(pos);
-		BlockEvent.EntityPlaceEvent placeEvent = new BlockEvent.EntityPlaceEvent(BlockSnapshot.create(context.focalPoint.getCommandSenderWorld().dimension(), context.focalPoint.getCommandSenderWorld(), pos), context.focalPoint.getCommandSenderWorld().getBlockState(pos.relative(Direction.UP)), context.caster);
-		MinecraftForge.EVENT_BUS.post(placeEvent);
-		if(placeEvent.isCanceled()) {
-			return null;
-		}
-		if(state.isAir() || state.getMaterial().isReplaceable()) {
-			context.focalPoint.getCommandSenderWorld().setBlockAndUpdate(pos, Blocks.FIRE.defaultBlockState());
-		} else {
-			pos = pos.above();
-			state = context.focalPoint.getCommandSenderWorld().getBlockState(pos);
+		BlockPos tpos = positionVal.toBlockPos();
+		
+		EntityTrickMote.create(context, Vector3.fromBlockPos(tpos).add(0.5, 0, 0.5), () -> {
+			BlockPos pos = tpos.below();
+			BlockState state = context.focalPoint.getCommandSenderWorld().getBlockState(pos);
+			BlockEvent.EntityPlaceEvent placeEvent = new BlockEvent.EntityPlaceEvent(BlockSnapshot.create(context.focalPoint.getCommandSenderWorld().dimension(), context.focalPoint.getCommandSenderWorld(), pos), context.focalPoint.getCommandSenderWorld().getBlockState(pos.relative(Direction.UP)), context.caster);
+			MinecraftForge.EVENT_BUS.post(placeEvent);
+			if(placeEvent.isCanceled()) return;
 			if(state.isAir() || state.getMaterial().isReplaceable()) {
 				context.focalPoint.getCommandSenderWorld().setBlockAndUpdate(pos, Blocks.FIRE.defaultBlockState());
+			} else {
+				pos = pos.above();
+				state = context.focalPoint.getCommandSenderWorld().getBlockState(pos);
+				if(state.isAir() || state.getMaterial().isReplaceable()) {
+					context.focalPoint.getCommandSenderWorld().setBlockAndUpdate(pos, Blocks.FIRE.defaultBlockState());
+				}
 			}
-		}
-
+		});
 		return null;
 	}
 

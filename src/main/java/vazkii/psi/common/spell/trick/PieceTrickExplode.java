@@ -24,6 +24,7 @@ import vazkii.psi.api.spell.StatLabel;
 import vazkii.psi.api.spell.param.ParamNumber;
 import vazkii.psi.api.spell.param.ParamVector;
 import vazkii.psi.api.spell.piece.PieceTrick;
+import vazkii.psi.common.entity.EntityTrickMote;
 
 public class PieceTrickExplode extends PieceTrick {
 
@@ -70,9 +71,11 @@ public class PieceTrickExplode extends PieceTrick {
 		}
 
 		BlockPos pos = positionVal.toBlockPos();
-		BlockState state = context.focalPoint.getCommandSenderWorld().getBlockState(pos);
-
-		context.focalPoint.getCommandSenderWorld().explode(context.focalPoint, positionVal.x, positionVal.y, positionVal.z, (float) powerVal, state.getMaterial().isLiquid() ? Explosion.BlockInteraction.NONE : Explosion.BlockInteraction.BREAK);
+		EntityTrickMote.create(context, pos, () -> {
+			BlockState state = context.focalPoint.getCommandSenderWorld().getBlockState(pos);
+	
+			context.focalPoint.getCommandSenderWorld().explode(context.focalPoint, positionVal.x, positionVal.y, positionVal.z, (float) powerVal, state.getMaterial().isLiquid() ? Explosion.BlockInteraction.NONE : Explosion.BlockInteraction.BREAK);
+		});
 		return null;
 	}
 

@@ -24,6 +24,7 @@ import vazkii.psi.api.spell.StatLabel;
 import vazkii.psi.api.spell.param.ParamNumber;
 import vazkii.psi.api.spell.param.ParamVector;
 import vazkii.psi.api.spell.piece.PieceTrick;
+import vazkii.psi.common.entity.EntityTrickMote;
 
 public class PieceTrickPlaceInSequence extends PieceTrick {
 
@@ -67,12 +68,8 @@ public class PieceTrickPlaceInSequence extends PieceTrick {
 		int maxBlocksInt = maxBlocksVal.intValue();
 		Vector3 directionVal = this.getParamValue(context, direction);
 
-		Direction direction = Direction.NORTH;
-		Direction horizontalFacing = Direction.NORTH;
-		if(directionVal != null) {
-			direction = Direction.getNearest(directionVal.x, directionVal.y, directionVal.z);
-			horizontalFacing = Direction.getNearest(directionVal.x, 0.0, directionVal.z);
-		}
+		Direction direction = directionVal == null ? Direction.NORTH : Direction.getNearest(directionVal.x, directionVal.y, directionVal.z);
+		Direction horizontalFacing = directionVal == null ? Direction.NORTH : Direction.getNearest(directionVal.x, 0.0, directionVal.z);
 
 		if(positionVal == null) {
 			throw new SpellRuntimeException(SpellRuntimeException.NULL_VECTOR);
@@ -83,8 +80,11 @@ public class PieceTrickPlaceInSequence extends PieceTrick {
 			if(!context.isInRadius(Vector3.fromBlockPos(blockPos))) {
 				throw new SpellRuntimeException(SpellRuntimeException.OUTSIDE_RADIUS);
 			}
-
-			PieceTrickPlaceBlock.placeBlock(context.caster, context.focalPoint.getCommandSenderWorld(), blockPos, context.getTargetSlot(), false, direction, horizontalFacing);
+			
+			int slot = context.getTargetSlot();
+			EntityTrickMote.create(context, blockPos, () -> {
+				PieceTrickPlaceBlock.placeBlock(context.caster, context.focalPoint.getCommandSenderWorld(), blockPos, slot, false, direction, horizontalFacing);
+			});
 		}
 
 		return null;

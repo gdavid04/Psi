@@ -24,6 +24,7 @@ import vazkii.psi.api.spell.StatLabel;
 import vazkii.psi.api.spell.param.ParamEntity;
 import vazkii.psi.api.spell.param.ParamNumber;
 import vazkii.psi.api.spell.piece.PieceTrick;
+import vazkii.psi.common.entity.EntityTrickMote;
 
 public abstract class PieceTrickPotionBase extends PieceTrick {
 
@@ -75,14 +76,12 @@ public abstract class PieceTrickPotionBase extends PieceTrick {
 			throw new SpellRuntimeException(SpellRuntimeException.OUTSIDE_RADIUS);
 		}
 
-		double powerVal = 1.0;
-		if(hasPower()) {
-			powerVal = this.getParamValue(context, power).doubleValue();
-		}
+		double powerVal = hasPower() ? this.getParamValue(context, power).doubleValue() : 1;
 		double timeVal = this.getParamValue(context, time).doubleValue();
 
-		((LivingEntity) targetVal).addEffect(new MobEffectInstance(getPotion(), Math.max(1, (int) timeVal) * 20, hasPower() ? Math.max(0, (int) powerVal - 1) : 0));
-
+		EntityTrickMote.create(context, targetVal, () -> {
+			((LivingEntity) targetVal).addEffect(new MobEffectInstance(getPotion(), Math.max(1, (int) timeVal) * 20, hasPower() ? Math.max(0, (int) powerVal - 1) : 0));
+		});
 		return null;
 	}
 

@@ -40,6 +40,7 @@ import vazkii.psi.api.spell.piece.PieceTrick;
 import vazkii.psi.client.core.handler.HUDHandler;
 import vazkii.psi.common.block.base.DirectionBlockItemUseContext;
 import vazkii.psi.common.block.base.ModBlocks;
+import vazkii.psi.common.entity.EntityTrickMote;
 
 public class PieceTrickPlaceBlock extends PieceTrick {
 
@@ -71,12 +72,8 @@ public class PieceTrickPlaceBlock extends PieceTrick {
 		Vector3 positionVal = this.getParamValue(context, position);
 		Vector3 directionVal = this.getParamValue(context, direction);
 
-		Direction facing = Direction.NORTH;
-		Direction horizontalFacing = Direction.NORTH;
-		if(directionVal != null) {
-			facing = Direction.getNearest(directionVal.x, directionVal.y, directionVal.z);
-			horizontalFacing = Direction.getNearest(directionVal.x, 0.0, directionVal.z);
-		}
+		Direction facing = directionVal == null ? Direction.NORTH : Direction.getNearest(directionVal.x, directionVal.y, directionVal.z);
+		Direction horizontalFacing = directionVal == null ? Direction.NORTH : Direction.getNearest(directionVal.x, 0.0, directionVal.z);
 
 		if(positionVal == null) {
 			throw new SpellRuntimeException(SpellRuntimeException.NULL_VECTOR);
@@ -86,7 +83,10 @@ public class PieceTrickPlaceBlock extends PieceTrick {
 		}
 
 		BlockPos pos = positionVal.toBlockPos();
-		placeBlock(context.caster, context.focalPoint.getCommandSenderWorld(), pos, context.getTargetSlot(), false, facing, horizontalFacing);
+		int slot = context.getTargetSlot();
+		EntityTrickMote.create(context, pos, () -> {
+			placeBlock(context.caster, context.focalPoint.getCommandSenderWorld(), pos, slot, false, facing, horizontalFacing);
+		});
 
 		return null;
 	}

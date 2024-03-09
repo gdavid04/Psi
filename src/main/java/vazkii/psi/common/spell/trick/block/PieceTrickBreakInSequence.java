@@ -24,6 +24,7 @@ import vazkii.psi.api.spell.StatLabel;
 import vazkii.psi.api.spell.param.ParamNumber;
 import vazkii.psi.api.spell.param.ParamVector;
 import vazkii.psi.api.spell.piece.PieceTrick;
+import vazkii.psi.common.entity.EntityTrickMote;
 
 public class PieceTrickBreakInSequence extends PieceTrick {
 
@@ -73,7 +74,9 @@ public class PieceTrickBreakInSequence extends PieceTrick {
 			if(!context.isInRadius(Vector3.fromBlockPos(blockPos))) {
 				throw new SpellRuntimeException(SpellRuntimeException.OUTSIDE_RADIUS);
 			}
-			PieceTrickBreakBlock.removeBlockWithDrops(context, context.caster, context.focalPoint.getCommandSenderWorld(), tool, blockPos, (v) -> true);
+			EntityTrickMote.create(context, blockPos, () -> {
+				PieceTrickBreakBlock.removeBlockWithDrops(context, context.caster, context.focalPoint.getCommandSenderWorld(), tool, blockPos, (v) -> true);
+			});
 
 		}
 

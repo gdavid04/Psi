@@ -32,6 +32,7 @@ import vazkii.psi.api.spell.SpellRuntimeException;
 import vazkii.psi.api.spell.StatLabel;
 import vazkii.psi.api.spell.param.ParamVector;
 import vazkii.psi.api.spell.piece.PieceTrick;
+import vazkii.psi.common.entity.EntityTrickMote;
 
 public class PieceTrickOvergrow extends PieceTrick {
 
@@ -58,7 +59,10 @@ public class PieceTrickOvergrow extends PieceTrick {
 	@Override
 	public Object execute(SpellContext context) throws SpellRuntimeException {
 		BlockPos pos = SpellHelpers.getBlockPos(this, context, position, true, false);
-		return bonemeal(context.caster, context.focalPoint.level, pos);
+		EntityTrickMote.create(context, pos, () -> {
+			bonemeal(context.caster, context.focalPoint.level, pos);
+		});
+		return null;
 	}
 
 	public InteractionResult bonemeal(Player player, Level world, BlockPos pos) {

@@ -24,6 +24,7 @@ import vazkii.psi.api.spell.*;
 import vazkii.psi.api.spell.param.ParamNumber;
 import vazkii.psi.api.spell.param.ParamVector;
 import vazkii.psi.api.spell.piece.PieceTrick;
+import vazkii.psi.common.entity.EntityTrickMote;
 import vazkii.psi.common.spell.selector.entity.PieceSelectorNearbySmeltables;
 
 public class PieceTrickSmeltBlockSequence extends PieceTrick {
@@ -67,10 +68,7 @@ public class PieceTrickSmeltBlockSequence extends PieceTrick {
 			throw new SpellRuntimeException(SpellRuntimeException.NULL_VECTOR);
 		}
 
-		ItemStack tool = context.tool;
-		if(tool.isEmpty()) {
-			tool = PsiAPI.getPlayerCAD(context.caster);
-		}
+		ItemStack tool = context.tool.isEmpty() ? PsiAPI.getPlayerCAD(context.caster) : context.tool;
 
 		Vector3 targetNorm = targetVal.copy().normalize();
 		for(BlockPos blockPos : MathHelper.getBlocksAlongRay(positionVal.toVec3D(), positionVal.copy().add(targetNorm.copy().multiply(maxBlocksInt)).toVec3D(), maxBlocksInt)) {
@@ -81,25 +79,27 @@ public class PieceTrickSmeltBlockSequence extends PieceTrick {
 			if(!context.focalPoint.getCommandSenderWorld().mayInteract(context.caster, blockPos)) {
 				return null;
 			}
-
-			BlockState state = context.focalPoint.getCommandSenderWorld().getBlockState(blockPos);
-			Block block = state.getBlock();
-			ItemStack stack = new ItemStack(block);
-			BlockEvent.BreakEvent event = PieceTrickBreakBlock.createBreakEvent(state, context.caster, context.focalPoint.level, blockPos, tool);
-			MinecraftForge.EVENT_BUS.post(event);
-			if(event.isCanceled()) {
-				return null;
-			}
-			ItemStack result = PieceSelectorNearbySmeltables.simulateSmelt(context.focalPoint.getCommandSenderWorld(), stack);
-			if(!result.isEmpty()) {
-				Item item = result.getItem();
-				Block block1 = Block.byItem(item);
-				if(block1 != Blocks.AIR) {
-					context.focalPoint.getCommandSenderWorld().setBlockAndUpdate(blockPos, block1.defaultBlockState());
-					context.focalPoint.getCommandSenderWorld().levelEvent(2001, blockPos, Block.getId(block1.defaultBlockState()));
+			
+			ItemStack res = PieceSelectorNearbySmeltables.simulateSmelt(context.focalPoint.getCommandSenderWorld(),
+					new ItemStack(context.focalPoint.getCommandSenderWorld().getBlockState(blockPos).getBlock()));
+			if (res.isEmpty()) continue;
+			EntityTrickMote.create(context, blockPos, () -> {
+				BlockState state = context.focalPoint.getCommandSenderWorld().getBlockState(blockPos);
+				Block block = state.getBlock();
+				ItemStack stack = new ItemStack(block);
+				BlockEvent.BreakEvent event = PieceTrickBreakBlock.createBreakEvent(state, context.caster, context.focalPoint.level, blockPos, tool);
+				MinecraftForge.EVENT_BUS.post(event);
+				if(event.isCanceled()) return;
+				ItemStack result = PieceSelectorNearbySmeltables.simulateSmelt(context.focalPoint.getCommandSenderWorld(), stack);
+				if(!result.isEmpty()) {
+					Item item = result.getItem();
+					Block block1 = Block.byItem(item);
+					if(block1 != Blocks.AIR) {
+						context.focalPoint.getCommandSenderWorld().setBlockAndUpdate(blockPos, block1.defaultBlockState());
+						context.focalPoint.getCommandSenderWorld().levelEvent(2001, blockPos, Block.getId(block1.defaultBlockState()));
+					}
 				}
-			}
-
+			});
 		}
 
 		return null;

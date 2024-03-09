@@ -27,6 +27,7 @@ import vazkii.psi.api.spell.param.ParamVector;
 import vazkii.psi.api.spell.piece.PieceTrick;
 import vazkii.psi.common.block.BlockConjured;
 import vazkii.psi.common.block.base.ModBlocks;
+import vazkii.psi.common.entity.EntityTrickMote;
 
 public class PieceTrickConjureBlockSequence extends PieceTrick {
 
@@ -84,8 +85,10 @@ public class PieceTrickConjureBlockSequence extends PieceTrick {
 			if(!world.mayInteract(context.caster, blockPos)) {
 				continue;
 			}
-
-			PieceTrickConjureBlock.conjure(context, timeVal, blockPos, world, messWithState(ModBlocks.conjured.defaultBlockState()));
+			
+			EntityTrickMote.create(context, blockPos, () -> {
+				PieceTrickConjureBlock.conjure(context, timeVal, blockPos, world, messWithState(ModBlocks.conjured.defaultBlockState()));
+			});
 		}
 
 		return null;
