@@ -3,11 +3,17 @@
 ### [better-error-catcher](https://github.com/gdavid04/Psi/tree/better-error-catcher)
 [![Download](https://img.shields.io/badge/download-better--error--catcher-9cf)](Psi 1.16 better-error-catcher.jar)  
 Changes Error Catcher to output the error handled value instead of replacing the result of its target.  
-Preview of what Error Catcher could become after 1.18 port.
+Preview of what Error Catcher could become eventually.  
+An improved version is part of the [Phi addon](https://github.com/gdavid04/phi)
+
+### [error-catcher-and-compiler-rewrite](https://github.com/gdavid04/Psi/tree/error-catcher-and-compiler-rewrite)
+Another implementation of the error catcher rework, also improving on compiler internals.  
+Unfinished.
 
 ### [entity-eye-position](https://github.com/gdavid04/Psi/tree/entity-eye-position)
 Changes Operator: Entity Position to always return foot position and adds Operator: Entity Eye Position.  
-Might be merged after 1.18 port.
+Might be merged eventually.  
+Operator: Entity Eye and Foot Position are currently part of the [Phi addon](https://github.com/gdavid04/phi)
 
 ### [empty-cad-slot](https://github.com/gdavid04/Psi/tree/empty-cad-slot)
 Adds an always empty slot to CADs, similar to tools and armor.  
@@ -31,3 +37,12 @@ The programmer GUI is buggy.
 [![Download](https://img.shields.io/badge/download-hexa--grid-fc9)](Psi 1.16 hexa-grid.jar)  
 Changes the spell grid to consist of hexagons instead of squares.  
 The programmer GUI, connector lines and bandwidth calculation are very buggy.
+
+### [cylinder](https://github.com/gdavid04/Psi/tree/cylinder)
+Changes the shape of the spell grid from square to cylinder.  
+The programmer GUI and bandwidth calculation are buggy.
+
+### [trick-travel-time](https://github.com/gdavid04/Psi/tree/trick-travel-time)
+Changes tricks to spawn motes that travel to the affected target from the focal point instead of affecting it directly and instantly.  
+The target has a chance at evading the motes when moving fast enough. A very small instant hit range is preserved.  
+Made as an experiment to rebalance the mod and add more visual effects.
